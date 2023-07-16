@@ -8,6 +8,7 @@ import {
 
 export const getPrefectures = async (): Promise<Prefecture[]> => {
   try {
+    console.log(process.env.REACT_APP_API_KEY);
     const result = await axios.get<ResponsePrefectures>(
       "https://opendata.resas-portal.go.jp/api/v1/prefectures/",
       { headers: { "X-API-KEY": process.env.REACT_APP_API_KEY } }
