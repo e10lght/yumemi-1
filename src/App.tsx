@@ -1,24 +1,40 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { PrefectureCheckboxes } from "./components/PrefectureCheckboxes";
+import { DemographicsRadioButtons } from "./components/DemographicsRadioButtons";
+import { Title } from "./components/Title";
+import { Graph } from "./components/Graph";
+import { usePopulationData } from "./hooks/usePopulationData";
 
 function App() {
+  const {
+    prefectures,
+    categories,
+    targets,
+    selectedCategoryIndex,
+    yearList,
+    onChangeDemographics,
+    onChangeCategory
+  } = usePopulationData();
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Title />
+      <PrefectureCheckboxes prefectures={prefectures} onChange={onChangeDemographics} />
+      {categories && (
+        <DemographicsRadioButtons
+          categories={categories}
+          selectedCategoryIndex={selectedCategoryIndex}
+          onChange={onChangeCategory}
+        />
+      )}
+      {categories && targets && (
+        <Graph
+          yearList={yearList}
+          categories={categories}
+          selectedCategoryIndex={selectedCategoryIndex}
+          targets={targets}
+          prefectures={prefectures}
+        />
+      )}
     </div>
   );
 }
