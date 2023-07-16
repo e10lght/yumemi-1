@@ -33,7 +33,7 @@ export const usePopulationData = () => {
     async (e: React.ChangeEvent<HTMLInputElement>) => {
       try {
         const prefCode = Number(e.target.value);
-        if (targets?.find((target) => prefCode === target.prefCode)) {
+        if (targets.find((target) => prefCode === target.prefCode)) {
           const filteredTargets = targets.filter(
             (demographics) => demographics.prefCode !== prefCode
           );
@@ -45,7 +45,7 @@ export const usePopulationData = () => {
             demographicsData: demographicsData.data,
             prefCode: prefCode
           } as GraphDemographicsData;
-          setTargets([...(targets || []), newTargets]);
+          setTargets([...targets, newTargets]);
         }
       } catch (error: unknown) {
         if (error instanceof Error) {
