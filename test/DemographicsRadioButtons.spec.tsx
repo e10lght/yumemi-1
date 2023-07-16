@@ -23,7 +23,7 @@ describe("DemographicsRadioButtons component", () => {
     });
 
     // 選択されている人口分類が正しく表示されていることを確認
-    expect(getByText(categories[selectedCategoryIndex]).querySelector("input")!.checked).toBe(true);
+    expect(getByText(categories[selectedCategoryIndex]).querySelector("input")?.checked).toBe(true);
   });
 
   it("should trigger onChange when a radio button is clicked", () => {
