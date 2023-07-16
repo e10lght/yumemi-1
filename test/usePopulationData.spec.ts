@@ -8,9 +8,27 @@ jest.mock("../src/api/api", () => ({
 }));
 
 describe("usePopulationData", () => {
-  it("Custom Hooks の返り値は hoge になること", () => {
+  it("Custom Hooks の返り値は hoge になること", async () => {
+    (getPrefectures as jest.Mock).mockResolvedValueOnce([{ prefCode: 1, prefName: "Tokyo" }]);
+    (getDemographicsData as jest.Mock).mockResolvedValueOnce({
+      data: [
+        {
+          /* データの構造を満たすオブジェクト */
+        }
+      ]
+    });
+
     const { result } = renderHook(() => usePopulationData());
-    expect(result.current.prefectures).toEqual([]);
+
+    // アサーションではなく、特定の値が変化するまで待つダミーの関数
+    await waitFor(() => {
+      if (result.current.prefectures.length === 0) {
+        throw new Error("waiting for prefectures");
+      }
+    });
+
+    // ここでアサーション
+    expect(result.current.prefectures).toEqual([{ prefCode: 1, prefName: "Tokyo" }]);
   });
 
   it("fetches prefectures and demographic data on initial render", async () => {
@@ -50,9 +68,10 @@ describe("usePopulationData", () => {
     });
 
     // Add the demographics data of Tokyo
-    act(() => {
+    await act(async () => {
       result.current.onChangeDemographics({ target: { value: "1" } } as any);
     });
+
     await waitFor(() => {
       expect(result.current.targets).toEqual([
         {
@@ -63,7 +82,7 @@ describe("usePopulationData", () => {
     });
 
     // Remove the demographics data of Tokyo
-    act(() => {
+    await act(async () => {
       result.current.onChangeDemographics({ target: { value: "1" } } as any);
     });
     await waitFor(() => {
@@ -78,15 +97,30 @@ describe("usePopulationData", () => {
     ]);
 
     const { result } = renderHook(() => usePopulationData());
+
+    // アサーションではなく、特定の値が変化するまで待つダミーの関数
     await waitFor(() => {
-      expect(result.current.selectedCategoryIndex).toEqual(0);
+      if (result.current.prefectures.length === 0) {
+        throw new Error("waiting for prefectures");
+      }
+    });
+
+    await waitFor(() => {
+      act(() => {
+        expect(result.current.selectedCategoryIndex).toEqual(0);
+      });
     });
 
     // Change the selected category index
     act(() => {
       result.current.onChangeCategory({ target: { value: "1" } } as any);
     });
-    expect(result.current.selectedCategoryIndex).toEqual(1);
+
+    await waitFor(() => {
+      act(() => {
+        expect(result.current.selectedCategoryIndex).toEqual(1);
+      });
+    });
   });
 
   it("handles errors in onChangeDemographics", async () => {

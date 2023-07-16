@@ -15,12 +15,15 @@ export const usePopulationData = () => {
       .then(([prefectures, demographicsData]) => {
         setPrefectures(prefectures);
         const labelList = [];
+        if (!demographicsData || !demographicsData.data) return;
         for (const data of demographicsData.data) {
           labelList.push(data.label);
         }
         setCategories(labelList);
         const yearCategories = [];
         // 年度は全配列で固定の値かつ要素数のため最初の要素を指定する
+        if (!demographicsData || !demographicsData.data[0] || !demographicsData.data[0].data)
+          return;
         for (const y of demographicsData.data[0].data) {
           yearCategories.push(y.year);
         }
