@@ -36,7 +36,7 @@ describe("DemographicsRadioButtons component", () => {
     );
 
     // ラジオボタンをクリックして、onChangeがトリガーされることを確認
-    fireEvent.click(getByLabelText("30-39歳"));
+    fireEvent.click(getByLabelText("総人口"));
     expect(mockOnChange).toHaveBeenCalled();
   });
 });

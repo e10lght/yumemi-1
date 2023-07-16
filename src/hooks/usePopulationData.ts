@@ -10,14 +10,9 @@ export const usePopulationData = () => {
   const [yearList, setYearList] = useState<number[]>([]);
 
   useEffect(() => {
-    let isUnmounted = false; // アンマウント時の更新関数実行を防ぐフラグ
-
     // 初期描画用のデータ取得のため、引数prefCodeは1とする
     Promise.all([getPrefectures(), getDemographicsData(1)])
       .then(([prefectures, demographicsData]) => {
-        if (isUnmounted) {
-          return;
-        }
         setPrefectures(prefectures);
         const labelList = [];
         for (const data of demographicsData.data) {
@@ -32,10 +27,6 @@ export const usePopulationData = () => {
         setYearList(yearCategories);
       })
       .catch((err) => console.log(err));
-
-    return () => {
-      isUnmounted = true;
-    };
   }, []);
 
   const onChangeDemographics = useCallback(
