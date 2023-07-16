@@ -38,10 +38,6 @@ export const Graph: React.FC<typeGraph> = memo(
           }))
         : []
     };
-    return (
-      <div>
-        <HighchartsReact highcharts={Highcharts} options={options} />
-      </div>
-    );
+    return <HighchartsReact highcharts={Highcharts} options={options} />;
   }
 );
