@@ -13,17 +13,15 @@ export const PrefectureCheckboxes: React.FC<typePrefectures> = memo(({ prefectur
       <h2>都道府県</h2>
       <div className="prefectureCheckboxes">
         {prefectures &&
-          prefectures.map((prefecture) => (
-            <label htmlFor={prefecture.prefCode} key={prefecture.prefCode}>
-              {prefecture.prefName}
-              <input
-                id={prefecture.prefCode}
-                type="checkbox"
-                value={prefecture.prefCode}
-                onChange={onChange}
-              />
-            </label>
-          ))}
+          prefectures.map((prefecture) => {
+            const id = `prefcode-${prefecture.prefCode}`;
+            return (
+              <label htmlFor={id} key={prefecture.prefCode}>
+                {prefecture.prefName}
+                <input id={id} type="checkbox" value={prefecture.prefCode} onChange={onChange} />
+              </label>
+            );
+          })}
       </div>
     </>
   );
