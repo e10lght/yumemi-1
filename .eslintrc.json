@@ -1,4 +1,5 @@
 {
+  "root": true,
   "env": {
     "browser": true,
     "es2021": true
@@ -19,5 +20,10 @@
     "react/react-in-jsx-scope": "off",
     "react/display-name": "off",
     "react/prop-types": "off"
+  },
+  "settings": {
+    "react": {
+      "version": "detect" // インストールしているバージョンを自動的に選択します
+    }
   }
 }
