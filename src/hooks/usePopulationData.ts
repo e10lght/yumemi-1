@@ -8,6 +8,7 @@ export const usePopulationData = () => {
   const [targets, setTargets] = useState<GraphDemographicsData[]>([]);
   const [selectedCategoryIndex, SetselectedCategoryIndex] = useState(0);
   const [yearList, setYearList] = useState<number[]>([]);
+  const [isDrawing, setIsDrawing] = useState(false);
 
   useEffect(() => {
     // 初期描画用のデータ取得のため、引数prefCodeは1とする
@@ -35,6 +36,7 @@ export const usePopulationData = () => {
   const onChangeDemographics = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
       try {
+        setIsDrawing(true);
         const prefCode = Number(e.target.value);
         if (targets.find((target) => prefCode === target.prefCode)) {
           const filteredTargets = targets.filter(
@@ -50,6 +52,7 @@ export const usePopulationData = () => {
           } as GraphDemographicsData;
           setTargets([...targets, newTargets]);
         }
+        setIsDrawing(false);
       } catch (error: unknown) {
         if (error instanceof Error) {
           console.error(error.message);
@@ -70,6 +73,7 @@ export const usePopulationData = () => {
     targets,
     selectedCategoryIndex,
     yearList,
+    isDrawing,
     onChangeDemographics,
     onChangeCategory
   };
