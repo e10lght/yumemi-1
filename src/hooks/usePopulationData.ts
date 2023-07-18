@@ -8,7 +8,6 @@ export const usePopulationData = () => {
   const [targets, setTargets] = useState<GraphDemographicsData[]>([]);
   const [selectedCategoryIndex, SetselectedCategoryIndex] = useState(0);
   const [yearList, setYearList] = useState<number[]>([]);
-  const [isDrawing, setIsDrawing] = useState(false);
 
   useEffect(() => {
     // 初期描画用のデータ取得のため、引数prefCodeは1とする
@@ -33,34 +32,28 @@ export const usePopulationData = () => {
       .catch((err) => console.log(err));
   }, []);
 
-  const onChangeDemographics = useCallback(
-    async (e: React.ChangeEvent<HTMLInputElement>) => {
-      try {
-        setIsDrawing(true);
-        const prefCode = Number(e.target.value);
-        if (targets.find((target) => prefCode === target.prefCode)) {
-          const filteredTargets = targets.filter(
-            (demographics) => demographics.prefCode !== prefCode
-          );
-          setTargets(filteredTargets);
-        } else {
-          const demographicsData = await getDemographicsData(prefCode);
+  const onChangeDemographics = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      const prefCode = Number(e.target.value);
+      if (targets.find((target) => prefCode === target.prefCode)) {
+        setTargets((prevTargets) =>
+          prevTargets.filter((demographics) => demographics.prefCode !== prefCode)
+        );
+      } else {
+        const demographicsData = await getDemographicsData(prefCode);
 
-          const newTargets = {
-            demographicsData: demographicsData.data,
-            prefCode: prefCode
-          } as GraphDemographicsData;
-          setTargets([...targets, newTargets]);
-        }
-        setIsDrawing(false);
-      } catch (error: unknown) {
-        if (error instanceof Error) {
-          console.error(error.message);
-        }
+        const newTargets = {
+          demographicsData: demographicsData.data,
+          prefCode: prefCode
+        } as GraphDemographicsData;
+        setTargets((prevTargets) => [...prevTargets, newTargets]);
       }
-    },
-    [targets]
-  );
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error(error.message);
+      }
+    }
+  }, []);
 
   const onChangeCategory = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const categoryIndex = Number(e.target.value);
@@ -73,7 +66,6 @@ export const usePopulationData = () => {
     targets,
     selectedCategoryIndex,
     yearList,
-    isDrawing,
     onChangeDemographics,
     onChangeCategory
   };
