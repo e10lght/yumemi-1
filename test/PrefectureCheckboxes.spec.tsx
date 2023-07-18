@@ -12,7 +12,7 @@ describe("PrefectureCheckboxesコンポーネント", () => {
 
   it("プロップスとして渡した値がコンポーネントで正しく表示されていること", () => {
     const { getByText } = render(
-      <PrefectureCheckboxes prefectures={prefectures} onChange={mockOnChange} isDrawing={false} />
+      <PrefectureCheckboxes prefectures={prefectures} onChange={mockOnChange} />
     );
 
     prefectures.forEach((prefecture) => {
@@ -22,7 +22,7 @@ describe("PrefectureCheckboxesコンポーネント", () => {
 
   it("チェックボックスをクリックすると、onChangeがトリガーされること", () => {
     const { getByLabelText } = render(
-      <PrefectureCheckboxes prefectures={prefectures} onChange={mockOnChange} isDrawing={false} />
+      <PrefectureCheckboxes prefectures={prefectures} onChange={mockOnChange} />
     );
 
     fireEvent.click(getByLabelText("北海道"));
