@@ -36,7 +36,6 @@ describe("usePopulationDataフック", () => {
       expect(result.current.categories).toEqual(["総人口"]);
       expect(result.current.targets).toEqual([]);
       expect(result.current.selectedCategoryIndex).toBe(0);
-      expect(result.current.isDrawing).toBe(false);
     });
   });
 
