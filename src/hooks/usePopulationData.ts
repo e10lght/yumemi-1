@@ -35,19 +35,20 @@ export const usePopulationData = () => {
   const onChangeDemographics = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     try {
       const prefCode = Number(e.target.value);
-      if (targets.find((target) => prefCode === target.prefCode)) {
-        setTargets((prevTargets) =>
-          prevTargets.filter((demographics) => demographics.prefCode !== prefCode)
-        );
-      } else {
-        const demographicsData = await getDemographicsData(prefCode);
+      const demographicsData = await getDemographicsData(prefCode);
 
-        const newTargets = {
-          demographicsData: demographicsData.data,
-          prefCode: prefCode
-        } as GraphDemographicsData;
-        setTargets((prevTargets) => [...prevTargets, newTargets]);
-      }
+      const newTargets = {
+        demographicsData: demographicsData.data,
+        prefCode: prefCode
+      } as GraphDemographicsData;
+      setTargets((prevTargets) => {
+        if (prevTargets.find((target) => prefCode === target.prefCode)) {
+          console.log(prevTargets.filter((demographics) => demographics.prefCode !== prefCode));
+          return prevTargets.filter((demographics) => demographics.prefCode !== prefCode);
+        } else {
+          return [...prevTargets, newTargets];
+        }
+      });
     } catch (error: unknown) {
       if (error instanceof Error) {
         console.error(error.message);
