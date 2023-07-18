@@ -8,39 +8,6 @@ jest.mock("../src/api/api", () => ({
 }));
 
 describe("usePopulationDataフック", () => {
-  it("呼び出した際に指定した返り値となること", async () => {
-    (getPrefectures as jest.Mock).mockResolvedValueOnce([{ prefCode: 1, prefName: "Tokyo" }]);
-    (getDemographicsData as jest.Mock).mockResolvedValueOnce({
-      boundaryYear: 2020,
-      data: [
-        {
-          label: "総人口",
-          data: [
-            {
-              year: 1960,
-              value: 5039206
-            },
-            {
-              year: 1965,
-              value: 5171800
-            }
-          ]
-        }
-      ]
-    });
-
-    const { result } = renderHook(() => usePopulationData());
-
-    await waitFor(() => {
-      expect(result.current.prefectures).toEqual([{ prefCode: 1, prefName: "Tokyo" }]);
-      expect(result.current.yearList).toEqual([1960, 1965]);
-      expect(result.current.categories).toEqual(["総人口"]);
-      expect(result.current.targets).toEqual([]);
-      expect(result.current.selectedCategoryIndex).toBe(0);
-      expect(result.current.isDrawing).toBe(false);
-    });
-  });
-
   it("初回レンダリング時に都道府県と人口統計データを取得できること", async () => {
     (getPrefectures as jest.Mock).mockResolvedValueOnce([{ prefCode: 1, prefName: "Tokyo" }]);
     (getDemographicsData as jest.Mock).mockResolvedValueOnce({
