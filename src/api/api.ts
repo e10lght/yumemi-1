@@ -12,9 +12,13 @@ export const getPrefectures = async (): Promise<Prefecture[]> => {
       "https://opendata.resas-portal.go.jp/api/v1/prefectures/",
       { headers: { "X-API-KEY": process.env.REACT_APP_API_KEY } }
     );
+    if (result.data.message !== null) {
+      throw new Error(result.data.message);
+    }
     const prefectures = result.data.result;
     return prefectures;
   } catch (error: unknown) {
+    console.log(error);
     if (error instanceof Error) {
       console.error(error.message);
     }
@@ -28,6 +32,9 @@ export const getDemographicsData = async (prefCode: number): Promise<Demographic
       `https://opendata.resas-portal.go.jp/api/v1/population/composition/perYear?prefCode=${prefCode}`,
       { headers: { "X-API-KEY": process.env.REACT_APP_API_KEY } }
     );
+    if (result.data.message !== null) {
+      throw new Error(result.data.message);
+    }
     const demographicsDataList = result.data.result;
     return demographicsDataList;
   } catch (error: unknown) {

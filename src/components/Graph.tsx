@@ -28,15 +28,15 @@ export const Graph: React.FC<typeGraph> = memo(
           text: categories && categories[selectedCategoryIndex]
         }
       },
-      series: targets
-        ? targets.map((target) => ({
-            data: target.demographicsData[selectedCategoryIndex].data.map((item) => [
-              item.year,
-              item.value
-            ]),
-            name: prefectures[target.prefCode - 1].prefName
-          }))
-        : []
+      series:
+        targets &&
+        targets.map((target) => ({
+          data: target.demographicsData[selectedCategoryIndex].data.map((item) => [
+            item.year,
+            item.value
+          ]),
+          name: prefectures[target.prefCode - 1].prefName
+        }))
     };
     return <HighchartsReact highcharts={Highcharts} options={options} />;
   }

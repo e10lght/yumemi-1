@@ -8,41 +8,37 @@ export const usePopulationData = () => {
   const [targets, setTargets] = useState<GraphDemographicsData[]>([]);
   const [selectedCategoryIndex, SetselectedCategoryIndex] = useState(0);
   const [yearList, setYearList] = useState<number[]>([]);
+  const [isDrawing, setIsDrawing] = useState(false);
 
   useEffect(() => {
-    let isUnmounted = false; // アンマウント時の更新関数実行を防ぐフラグ
-
     // 初期描画用のデータ取得のため、引数prefCodeは1とする
     Promise.all([getPrefectures(), getDemographicsData(1)])
       .then(([prefectures, demographicsData]) => {
-        if (isUnmounted) {
-          return;
-        }
         setPrefectures(prefectures);
         const labelList = [];
+        if (!demographicsData || !demographicsData.data) return;
         for (const data of demographicsData.data) {
           labelList.push(data.label);
         }
         setCategories(labelList);
         const yearCategories = [];
         // 年度は全配列で固定の値かつ要素数のため最初の要素を指定する
+        if (!demographicsData || !demographicsData.data[0] || !demographicsData.data[0].data)
+          return;
         for (const y of demographicsData.data[0].data) {
           yearCategories.push(y.year);
         }
         setYearList(yearCategories);
       })
       .catch((err) => console.log(err));
-
-    return () => {
-      isUnmounted = true;
-    };
   }, []);
 
   const onChangeDemographics = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
       try {
+        setIsDrawing(true);
         const prefCode = Number(e.target.value);
-        if (targets?.find((target) => prefCode === target.prefCode)) {
+        if (targets.find((target) => prefCode === target.prefCode)) {
           const filteredTargets = targets.filter(
             (demographics) => demographics.prefCode !== prefCode
           );
@@ -54,8 +50,9 @@ export const usePopulationData = () => {
             demographicsData: demographicsData.data,
             prefCode: prefCode
           } as GraphDemographicsData;
-          setTargets([...(targets || []), newTargets]);
+          setTargets([...targets, newTargets]);
         }
+        setIsDrawing(false);
       } catch (error: unknown) {
         if (error instanceof Error) {
           console.error(error.message);
@@ -76,6 +73,7 @@ export const usePopulationData = () => {
     targets,
     selectedCategoryIndex,
     yearList,
+    isDrawing,
     onChangeDemographics,
     onChangeCategory
   };

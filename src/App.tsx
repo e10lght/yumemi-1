@@ -11,6 +11,7 @@ function App() {
     targets,
     selectedCategoryIndex,
     yearList,
+    isDrawing,
     onChangeDemographics,
     onChangeCategory
   } = usePopulationData();
@@ -18,7 +19,11 @@ function App() {
   return (
     <div className="App">
       <Title />
-      <PrefectureCheckboxes prefectures={prefectures} onChange={onChangeDemographics} />
+      <PrefectureCheckboxes
+        prefectures={prefectures}
+        onChange={onChangeDemographics}
+        isDrawing={isDrawing}
+      />
       {categories && (
         <DemographicsRadioButtons
           categories={categories}
