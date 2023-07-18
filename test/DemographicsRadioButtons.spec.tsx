@@ -3,12 +3,12 @@ import { render, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { DemographicsRadioButtons } from "../src/components/DemographicsRadioButtons";
 
-describe("DemographicsRadioButtons component", () => {
+describe("DemographicsRadioButtonsコンポーネント", () => {
   const mockOnChange = jest.fn();
   const categories = ["総人口", "年少人口", "生産年齢人口", "老年人口"];
-  const selectedCategoryIndex = 1;
+  const selectedCategoryIndex = 0;
 
-  it("should render correctly", () => {
+  it("プロップスとして渡した値がコンポーネントで正しく表示されていること", () => {
     const { getByText } = render(
       <DemographicsRadioButtons
         categories={categories}
@@ -17,16 +17,14 @@ describe("DemographicsRadioButtons component", () => {
       />
     );
 
-    // プロップスとして渡した人口分類が表示されていることを確認
     categories.forEach((category) => {
       expect(getByText(category)).toBeInTheDocument();
     });
 
-    // 選択されている人口分類が正しく表示されていることを確認
     expect(getByText(categories[selectedCategoryIndex]).querySelector("input")?.checked).toBe(true);
   });
 
-  it("should trigger onChange when a radio button is clicked", () => {
+  it("ラジオボタンをクリックして、onChangeがトリガーされること", () => {
     const { getByLabelText } = render(
       <DemographicsRadioButtons
         categories={categories}
@@ -35,8 +33,11 @@ describe("DemographicsRadioButtons component", () => {
       />
     );
 
-    // ラジオボタンをクリックして、onChangeがトリガーされることを確認
-    fireEvent.click(getByLabelText("総人口"));
-    expect(mockOnChange).toHaveBeenCalled();
+    fireEvent.click(getByLabelText("老年人口"));
+    expect(mockOnChange).toHaveBeenCalledWith(
+      expect.objectContaining({
+        target: expect.objectContaining({ value: "3" })
+      })
+    );
   });
 });

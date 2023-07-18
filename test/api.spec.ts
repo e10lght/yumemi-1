@@ -1,13 +1,15 @@
 import axios from "axios";
 import { getPrefectures, getDemographicsData } from "../src/api/api";
 
-// axiosをモック化
 jest.mock("axios");
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 describe("api", () => {
+  beforeEach(() => {
+    mockedAxios.get.mockClear();
+  });
+
   it("都道府県データの取得", async () => {
-    // モックの結果を設定
     mockedAxios.get.mockResolvedValueOnce({
       data: {
         result: [
@@ -26,8 +28,15 @@ describe("api", () => {
     });
 
     const prefectures = await getPrefectures();
-    // 結果の確認
-    expect(prefectures[0].prefName).toEqual("北海道");
+
+    const result = [
+      { prefCode: 1, prefName: "北海道" },
+      { prefCode: 2, prefName: "青森県" }
+    ];
+    for (let i = 0; i < prefectures.length; i++) {
+      expect(prefectures[i].prefName).toEqual(result[i].prefName);
+      expect(prefectures[i].prefCode).toEqual(result[i].prefCode);
+    }
     expect(mockedAxios.get).toHaveBeenCalledWith(
       "https://opendata.resas-portal.go.jp/api/v1/prefectures/",
       { headers: { "X-API-KEY": process.env.REACT_APP_API_KEY } }
@@ -35,7 +44,6 @@ describe("api", () => {
   });
 
   it("人口推移データの取得", async () => {
-    // モックの結果を設定
     mockedAxios.get.mockResolvedValueOnce({
       data: {
         message: null,
@@ -62,8 +70,19 @@ describe("api", () => {
 
     const demographicsData = await getDemographicsData(1);
 
-    // 結果の確認
-    expect(demographicsData.boundaryYear).toEqual(2020);
+    expect(demographicsData).toEqual({
+      boundaryYear: 2020,
+      data: [
+        {
+          label: "総人口",
+          data: [
+            { year: 1960, value: 5039206 },
+            { year: 1965, value: 5171800 }
+          ]
+        }
+      ]
+    });
+
     expect(mockedAxios.get).toHaveBeenCalledWith(
       "https://opendata.resas-portal.go.jp/api/v1/population/composition/perYear?prefCode=1",
       { headers: { "X-API-KEY": process.env.REACT_APP_API_KEY } }
@@ -71,7 +90,7 @@ describe("api", () => {
   });
 
   it("人口推移データの取得の際、エラーの場合", async () => {
-    // モックの結果を設定
+    const errorSpy = jest.spyOn(console, "error").mockImplementation();
     mockedAxios.get.mockResolvedValueOnce({
       data: {
         message: "404. That's an error.",
@@ -97,17 +116,19 @@ describe("api", () => {
       status: 200
     });
 
-    const demographicsData = await getDemographicsData(1);
+    const demographicsData = await getDemographicsData(99);
+    console.log(demographicsData);
 
-    // 結果の確認
+    expect(errorSpy).toHaveBeenCalledWith("404. That's an error.");
     expect(demographicsData).toEqual({ boundaryYear: 0, data: [] });
     expect(mockedAxios.get).toHaveBeenCalledWith(
-      "https://opendata.resas-portal.go.jp/api/v1/prefectures/",
+      `https://opendata.resas-portal.go.jp/api/v1/population/composition/perYear?prefCode=99`,
       { headers: { "X-API-KEY": process.env.REACT_APP_API_KEY } }
     );
   });
 
   it("都道府県をフェッチした際、エラーの場合", async () => {
+    const errorSpy = jest.spyOn(console, "error").mockImplementation();
     mockedAxios.get.mockResolvedValueOnce({
       data: {
         result: [
@@ -127,7 +148,7 @@ describe("api", () => {
 
     const prefectures = await getPrefectures();
 
-    // 結果の確認
+    expect(errorSpy).toHaveBeenCalledWith("404. That's an error.");
     expect(prefectures).toEqual([]);
     expect(mockedAxios.get).toHaveBeenCalledWith(
       "https://opendata.resas-portal.go.jp/api/v1/prefectures/",

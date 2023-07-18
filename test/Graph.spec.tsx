@@ -3,11 +3,19 @@ import { render, screen } from "@testing-library/react";
 import { Graph } from "../src/components/Graph";
 import "@testing-library/jest-dom";
 
-jest.mock("highcharts-react-official", () => ({
-  HighchartsReact: () => <div>Highcharts</div>
-}));
+jest.mock("highcharts-react-official", () => {
+  return {
+    HighchartsReact: jest.fn().mockImplementation(({ options }) => {
+      return (
+        <div data-testid="highcharts-mock" data-options={JSON.stringify(options)}>
+          Highcharts
+        </div>
+      );
+    })
+  };
+});
 
-describe("Graph component", () => {
+describe("Graphコンポーネント", () => {
   const mockData = {
     yearList: [2015, 2016, 2017],
     categories: ["総人口", "生産年齢人口", "年少人口", "老年人口"],
@@ -46,7 +54,7 @@ describe("Graph component", () => {
     ]
   };
 
-  it("should render correctly", () => {
+  it("プロップスとして渡した値がコンポーネントで正しく表示されていること", () => {
     render(
       <Graph
         yearList={mockData.yearList}
@@ -56,77 +64,28 @@ describe("Graph component", () => {
         prefectures={mockData.prefectures}
       />
     );
+
     expect(screen.getByText("Highcharts")).toBeInTheDocument();
   });
 
-  it("should render correctly when targets is empty", () => {
+  it("渡したプロップスの値が正しく整形されていること", () => {
     render(
       <Graph
         yearList={mockData.yearList}
         categories={mockData.categories}
-        selectedCategoryIndex={mockData.selectedCategoryIndex}
-        targets={[]} // targets is empty
-        prefectures={mockData.prefectures}
-      />
-    );
-    // Add assertions here
-  });
-
-  it("should render correctly when categories is empty", () => {
-    render(
-      <Graph
-        yearList={mockData.yearList}
-        categories={[]} // categories is empty
         selectedCategoryIndex={mockData.selectedCategoryIndex}
         targets={mockData.targets}
         prefectures={mockData.prefectures}
       />
     );
-    // Add assertions here
-  });
 
-  it("should render correctly when targets is empty", () => {
-    render(
-      <Graph
-        yearList={mockData.yearList}
-        categories={mockData.categories}
-        selectedCategoryIndex={mockData.selectedCategoryIndex}
-        targets={[]} // targets is empty
-        prefectures={mockData.prefectures}
-      />
-    );
-    // ここで期待する結果に対するアサーションを行います。例えば：
-    // expect(screen.queryByText(/北海道/)).toBeNull(); // "北海道"というテキストが存在しないことをチェック
+    const divElement = screen.getByTestId("highcharts-mock");
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const options = JSON.parse(divElement.getAttribute("data-options")!);
+    expect(options.title.text).toBe("都道府県別の総人口推移グラフ");
+    expect(options.xAxis.categories).toEqual([2015, 2016, 2017]);
+    expect(options.series[0].data[0]).toEqual([2015, 5000]);
+    expect(options.yAxis.title.text).toBe("総人口");
+    expect(options.series[0].name).toBe("北海道");
   });
 });
-
-/*
-describe("Graph component", () => {
-  it("should map targets to series data correctly", () => {
-    const props: typeGraph = {
-      yearList: [2023],
-      categories: ["Total Population"],
-      selectedCategoryIndex: 0,
-      targets: [
-        {
-          demographicsData: [
-            {
-              label: "Total Population",
-              data: [{ year: 2023, value: 10000 }]
-            }
-          ],
-          prefCode: 1
-        }
-      ],
-      prefectures: [{ prefCode: "1", prefName: "Tokyo" }]
-    };
-
-    const { container } = render(<Graph {...props} />);
-
-    // Replace the following with your assertion
-    // For example, you could verify that the expected series data is present
-    // in the Highcharts options, but the specific assertion will depend on your implementation.
-    expect(container).toMatchSnapshot();
-  });
-});
-*/

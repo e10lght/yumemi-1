@@ -3,11 +3,10 @@ import React from "react";
 import { Title } from "../src/components/Title";
 import "jest-environment-jsdom";
 
-describe("Title component", () => {
-  it("should render correctly", () => {
+describe("Titleコンポーネント", () => {
+  it("h1要素が指定した文字列で存在すること", () => {
     render(<Title />);
 
-    // h1要素が存在することを確認
     expect(screen.getByText("ゆめみ課題")).toBeTruthy();
     expect(screen.getByRole("heading", { level: 1 })).toBeTruthy();
   });

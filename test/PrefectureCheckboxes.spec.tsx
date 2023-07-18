@@ -3,31 +3,33 @@ import { render, fireEvent } from "@testing-library/react";
 import { PrefectureCheckboxes } from "../src/components/PrefectureCheckboxes";
 import "@testing-library/jest-dom";
 
-describe("PrefectureCheckboxes component", () => {
+describe("PrefectureCheckboxesコンポーネント", () => {
   const mockOnChange = jest.fn();
   const prefectures = [
     { prefCode: "1", prefName: "北海道" },
     { prefCode: "2", prefName: "青森県" }
   ];
 
-  it("should render correctly", () => {
+  it("プロップスとして渡した値がコンポーネントで正しく表示されていること", () => {
     const { getByText } = render(
-      <PrefectureCheckboxes prefectures={prefectures} onChange={mockOnChange} />
+      <PrefectureCheckboxes prefectures={prefectures} onChange={mockOnChange} isDrawing={false} />
     );
 
-    // プロップスとして渡した都道府県名が表示されていることを確認
     prefectures.forEach((prefecture) => {
       expect(getByText(prefecture.prefName)).toBeInTheDocument();
     });
   });
 
-  it("should trigger onChange when a checkbox is clicked", () => {
+  it("チェックボックスをクリックすると、onChangeがトリガーされること", () => {
     const { getByLabelText } = render(
-      <PrefectureCheckboxes prefectures={prefectures} onChange={mockOnChange} />
+      <PrefectureCheckboxes prefectures={prefectures} onChange={mockOnChange} isDrawing={false} />
     );
 
-    // チェックボックスをクリックして、onChangeがトリガーされることを確認
     fireEvent.click(getByLabelText("北海道"));
-    expect(mockOnChange).toHaveBeenCalled();
+    expect(mockOnChange).toHaveBeenCalledWith(
+      expect.objectContaining({
+        target: expect.objectContaining({ value: "1" })
+      })
+    );
   });
 });
