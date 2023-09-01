@@ -117,7 +117,6 @@ describe("api", () => {
     });
 
     const demographicsData = await getDemographicsData(99);
-    console.log(demographicsData);
 
     expect(errorSpy).toHaveBeenCalledWith("404. That's an error.");
     expect(demographicsData).toEqual({ boundaryYear: 0, data: [] });

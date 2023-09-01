@@ -36,6 +36,7 @@ export const usePopulationData = () => {
     try {
       const prefCode = Number(e.target.value);
       const demographicsData = await getDemographicsData(prefCode);
+      console.log(demographicsData);
 
       const newTargets = {
         demographicsData: demographicsData.data,
@@ -43,7 +44,6 @@ export const usePopulationData = () => {
       } as GraphDemographicsData;
       setTargets((prevTargets) => {
         if (prevTargets.find((target) => prefCode === target.prefCode)) {
-          console.log(prevTargets.filter((demographics) => demographics.prefCode !== prefCode));
           return prevTargets.filter((demographics) => demographics.prefCode !== prefCode);
         } else {
           return [...prevTargets, newTargets];

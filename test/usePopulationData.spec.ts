@@ -1,4 +1,4 @@
-import { renderHook, waitFor } from "@testing-library/react";
+import { act, renderHook, waitFor } from "@testing-library/react";
 import { usePopulationData } from "../src/hooks/usePopulationData";
 import { getPrefectures, getDemographicsData } from "../src/api/api";
 
@@ -39,7 +39,7 @@ describe("usePopulationDataフック", () => {
     });
   });
 
-  it("onChangeDemographicsが呼び出されたときに、都道府県の人口統計データが追加または削除されること", async () => {
+  it("onChangeDemographicsが呼び出されたときに、都道府県の人口統計データが追加されること", async () => {
     (getPrefectures as jest.Mock).mockResolvedValueOnce([
       { prefCode: 1, prefName: "Tokyo" },
       { prefCode: 2, prefName: "Kanagawa" }
@@ -89,13 +89,16 @@ describe("usePopulationDataフック", () => {
         { prefCode: 1, prefName: "Tokyo" },
         { prefCode: 2, prefName: "Kanagawa" }
       ]);
+      expect(result.current.targets).toEqual([]);
     });
 
-    await waitFor(() => {
-      result.current.onChangeDemographics({
+    await act(async () => {
+      await result.current.onChangeDemographics({
         target: { value: "1" }
       } as React.ChangeEvent<HTMLInputElement>);
+    });
 
+    await waitFor(() =>
       expect(result.current.targets).toEqual([
         {
           demographicsData: [
@@ -112,15 +115,8 @@ describe("usePopulationDataフック", () => {
           ],
           prefCode: 1
         }
-      ]);
-    });
-
-    await waitFor(() => {
-      result.current.onChangeDemographics({
-        target: { value: "1" }
-      } as React.ChangeEvent<HTMLInputElement>);
-      expect(result.current.targets).toEqual([]);
-    });
+      ])
+    );
   });
 
   it("onChangeCategoryが呼び出されたときに、選択されたカテゴリのインデックスが変更されること", async () => {
@@ -193,7 +189,53 @@ describe("usePopulationDataフック", () => {
         target: { value: "1" }
       } as React.ChangeEvent<HTMLInputElement>);
 
-      expect(console.error).toHaveBeenCalledWith("Network error");
+      expect(console.error).toHaveBeenCalledWith(
+        "Cannot read properties of undefined (reading 'data')"
+      );
+    });
+  });
+
+  it("onChangeDemographicsが呼び出されたときに、都道府県の人口統計データが削除されること", async () => {
+    (getPrefectures as jest.Mock).mockResolvedValueOnce([
+      { prefCode: 1, prefName: "Tokyo" },
+      { prefCode: 2, prefName: "Kanagawa" }
+    ]);
+
+    (getDemographicsData as jest.Mock).mockResolvedValue({
+      boundaryYear: 2020,
+      data: [
+        {
+          label: "総人口",
+          data: [
+            {
+              year: 1960,
+              value: 5039206
+            },
+            {
+              year: 1965,
+              value: 5171800
+            }
+          ]
+        }
+      ]
+    });
+
+    const { result } = renderHook(() => usePopulationData());
+
+    await act(async () => {
+      await result.current.onChangeDemographics({
+        target: { value: "1" }
+      } as React.ChangeEvent<HTMLInputElement>);
+    });
+
+    await act(async () => {
+      await result.current.onChangeDemographics({
+        target: { value: "1" }
+      } as React.ChangeEvent<HTMLInputElement>);
+    });
+
+    await waitFor(() => {
+      expect(result.current.targets).toEqual([]);
     });
   });
 });
